@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Trading App</title>
+</head>
+<body>
+  <h1>Trading App</h1>
+
+  <div>
+    <h2>Trade Parameters</h2>
+    <label for="stop-loss">Stop Loss Percentage:</label>
+    <input type="text" id="stop-loss" name="stop-loss" placeholder="Enter stop loss percentage">
+    <br>
+    <label for="risk-percentage">Risk Percentage:</label>
+    <input type="text" id="risk-percentage" name="risk-percentage" placeholder="Enter risk percentage">
+    <br>
+    <button id="activate-btn">Activate Trading Bot</button>
+    <button id="deactivate-btn">Deactivate Trading Bot</button>
+  </div>
+
+  <div id="trade-info"></div>
+
+  <script>
+    const socket = new WebSocket('ws://localhost:5000/api/trading-bot');
+
+    // WebSocket event handlers
+    socket.onopen = () => {
+      console.log('WebSocket connection established');
+    };
+
+    socket.onmessage = (event) => {
+      const tradeInfo = JSON.parse(event.data);
+      // Update the front-end with trade information
+      const tradeElement = document.createElement('p');
+      tradeElement.textContent = `Trade: ${tradeInfo.tradeId} - Profit: ${tradeInfo.profit}`;
+      document.getElementById('trade-info').appendChild(tradeElement);
+    };
+
+    socket.onclose = () => {
+      console.log('WebSocket connection closed');
+    };
+
+    // Button event handlers
+    const activateBtn = document.getElementById('activate-btn');
+    activateBtn.addEventListener('click', () => {
+      // Handle the activate button click
+      socket.send('activate');
+    });
+
+    const deactivateBtn = document.getElementById('deactivate-btn');
+    deactivateBtn.addEventListener('click', () => {
+      // Handle the deactivate button click
+      socket.send('deactivate');
+    });
+  </script>
+</body>
+</html>
